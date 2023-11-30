@@ -27,17 +27,6 @@ class Obstacle_GPT:
         return model_response
 
     def update_dialogue_history(self):
-        first_message = self.dialogue_history[0]
-        half_length = len(self.dialogue_history) // 2
-        self.dialogue_history = [first_message] + self.dialogue_history[-half_length:]
 
+        del self.dialogue_history[1:3]
 
-# generator_ai = Obstacle_GPT(api_key="", init_prompt=PROMPT)
-#
-# obstacle_list = generator_ai.get_response("start a generation task")
-#
-# obstacle_list = ast.literal_eval(obstacle_list)
-#
-# print(obstacle_list)
-#
-# print(type(obstacle_list))

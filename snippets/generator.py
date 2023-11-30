@@ -9,7 +9,7 @@ import shutil
 import random
 
 PROMPT = (
-    "Your task is to generate up to four obstacles with the specific aim of causing an autonomous drone to be unable to"
+    "\nThe above describes the flight path of a drone. Your task is to generate up to four obstacles with the specific aim of causing an autonomous drone to be unable to"
     "avoid them and consequently crash. The obstacle configurations are expected to keep the flight mission "
     "physically feasible and not create an impenetrable barrier. The minimum distance between at least two obstacles "
     "is greater than 3. Each obstacle is defined by its length (l), width (w), height (h), coordinates (x, y, z), "
@@ -38,39 +38,55 @@ class AIGenerator(object):
             ulg_files = [f for f in os.listdir("results") if f.endswith('.ulg')]
 
             if i == 0:
+                print("initial generation")
+                init_generate = True
                 obstacle_list = []
-                selected_seed = self.corpus.pop(0)
-                self.corpus = self.add_seed(self.corpus)
-                selected_seed = str(selected_seed)
-                generator_ai = Obstacle_GPT(api_key="",
-                                            init_prompt=(PROMPT+selected_seed))
-                response = generator_ai.get_response(init_user_prompt)
-                print("GPT: ", response)
-                for obstacle_info in response:
-                    size = Obstacle.Size(
-                        l=obstacle_info['l'],
-                        w=obstacle_info['w'],
-                        h=obstacle_info['h'],
+
+                size = Obstacle.Size(
+                        l=10,
+                        w=5,
+                        h=20,
                     )
 
-                    position = Obstacle.Position(
-                        x=obstacle_info['x'],
-                        y=obstacle_info['y'],
-                        z=obstacle_info['z'],
-                        r=obstacle_info['r'],
+                position = Obstacle.Position(
+                        x=10,
+                        y=20,
+                        z=0,
+                        r=0,
                     )
 
-                    obstacle = Obstacle(size, position)
-                    obstacle_list.append(obstacle)
+                obstacle = Obstacle(size, position)
+                obstacle_list.append(obstacle)
+
+                size = Obstacle.Size(
+                    l=10,
+                    w=5,
+                    h=20,
+                )
+
+                position = Obstacle.Position(
+                    x=-10,
+                    y=20,
+                    z=0,
+                    r=0,
+                )
+
+                obstacle = Obstacle(size, position)
+                obstacle_list.append(obstacle)
 
             else:
-                if found:
+                if found or init_generate:
                     obstacle_list = []
                     selected_seed = self.corpus.pop(0)
                     self.corpus = self.add_seed(self.corpus)
                     selected_seed = str(selected_seed)
+
+                    ulg_files.sort(key=lambda x: os.path.getmtime(os.path.join("results", x)))
+                    logfile = "results/" + ulg_files[0]
+                    flight_trajectory = read_ulg(logfile, 5)
+
                     generator_ai = Obstacle_GPT(api_key="",
-                                                init_prompt=(PROMPT + selected_seed))
+                                                init_prompt=(flight_trajectory + PROMPT + selected_seed))
                     response = generator_ai.get_response(init_user_prompt)
 
                     print("GPT: ", response)
@@ -90,6 +106,8 @@ class AIGenerator(object):
 
                         obstacle = Obstacle(size, position)
                         obstacle_list.append(obstacle)
+
+                    init_generate = False
 
                 else:
 
@@ -141,7 +159,7 @@ class AIGenerator(object):
                 print("Exception during test execution, skipping the test")
                 print(e)
 
-            if i % 3 == 0 and i != 3:
+            if i > 2:
                 generator_ai.update_dialogue_history()
 
         ### You should only return the test cases
