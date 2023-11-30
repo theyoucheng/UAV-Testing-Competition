@@ -32,7 +32,7 @@ class Obstacle_GPT:
         self.dialogue_history = [first_message] + self.dialogue_history[-half_length:]
 
 
-# generator_ai = Obstacle_GPT(api_key="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", init_prompt=PROMPT)
+# generator_ai = Obstacle_GPT(api_key="", init_prompt=PROMPT)
 #
 # obstacle_list = generator_ai.get_response("start a generation task")
 #

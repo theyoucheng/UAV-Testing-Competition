@@ -42,7 +42,7 @@ class AIGenerator(object):
                 selected_seed = self.corpus.pop(0)
                 self.corpus = self.add_seed(self.corpus)
                 selected_seed = str(selected_seed)
-                generator_ai = Obstacle_GPT(api_key="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",
+                generator_ai = Obstacle_GPT(api_key="",
                                             init_prompt=(PROMPT+selected_seed))
                 response = generator_ai.get_response(init_user_prompt)
                 print("GPT: ", response)
@@ -69,7 +69,7 @@ class AIGenerator(object):
                     selected_seed = self.corpus.pop(0)
                     self.corpus = self.add_seed(self.corpus)
                     selected_seed = str(selected_seed)
-                    generator_ai = Obstacle_GPT(api_key="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",
+                    generator_ai = Obstacle_GPT(api_key="",
                                                 init_prompt=(PROMPT + selected_seed))
                     response = generator_ai.get_response(init_user_prompt)
 
