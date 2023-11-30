@@ -6,7 +6,7 @@ import os
 import shutil
 import sys
 from decouple import config
-from random_generator import RandomGenerator
+from generator import AIGenerator
 
 TESTS_FOLDER = config("TESTS_FOLDER", default="./generated_tests/")
 logger = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     config_loggers()
     try:
         args = arg_parse()
-        generator = RandomGenerator(case_study_file=args.test)
+        generator = AIGenerator(case_study_file=args.test)
         test_cases = generator.generate(args.budget)
 
         ### copying the test cases to the output folder
@@ -66,7 +66,8 @@ if __name__ == "__main__":
         os.mkdir(tests_fld)
         for i in range(len(test_cases)):
             test_cases[i].save_yaml(f"{tests_fld}/test_{i}.yaml")
-            shutil.copy2(test_cases[i].log_file, f"{tests_fld}/test_{i}.ulg")
+            if os.path.exists(test_cases[i].log_file):
+                shutil.copy2(test_cases[i].log_file, f"{tests_fld}/test_{i}.ulg")
             shutil.copy2(test_cases[i].plot_file, f"{tests_fld}/test_{i}.png")
         print(f"{len(test_cases)} test cases generated")
         print(f"output folder: {tests_fld}")
