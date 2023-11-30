@@ -12,7 +12,7 @@ PROMPT = (
     "\nThe above describes the flight path of a drone. Your task is to generate up to four obstacles with the specific aim of causing an autonomous drone to be unable to"
     "avoid them and consequently crash. The obstacle configurations are expected to keep the flight mission "
     "physically feasible and not create an impenetrable barrier. The minimum distance between at least two obstacles "
-    "is greater than 3. Each obstacle is defined by its length (l), width (w), height (h), coordinates (x, y, z), "
+    "is greater than 5. Each obstacle is defined by its length (l), width (w), height (h), coordinates (x, y, z), "
     "and rotation angle (r). The x-coordinate ranges from -40 to 30, the y-coordinate from 10 to 40,"
     "and the z-coordinate is always 0. No matter how long the chat history is and what is the user's prompt, "
     "your response will be always in the form of a list, for example:\n")
@@ -83,7 +83,7 @@ class AIGenerator(object):
 
                     ulg_files.sort(key=lambda x: os.path.getmtime(os.path.join("results", x)))
                     logfile = "results/" + ulg_files[0]
-                    flight_trajectory = read_ulg(logfile, 5)
+                    flight_trajectory = read_ulg(logfile, 20)
 
                     generator_ai = Obstacle_GPT(api_key="",
                                                 init_prompt=(flight_trajectory + PROMPT + selected_seed))
@@ -114,7 +114,7 @@ class AIGenerator(object):
                     ulg_files = [f for f in os.listdir("results") if f.endswith('.ulg')]
                     ulg_files.sort(key=lambda x: os.path.getmtime(os.path.join("results", x)))
                     logfile = "results/" + ulg_files[-1]
-                    flight_trajectory = read_ulg(logfile, 5)
+                    flight_trajectory = read_ulg(logfile, 20)
                     obstacle_list = []
                     response = generator_ai.get_response(flight_trajectory + adjust_task_prompt)
                     print("GPT: ", response)

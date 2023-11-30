@@ -2,7 +2,7 @@ import pyulog
 import os
 
 
-def read_ulg(log_file, time_interval):
+def read_ulg(log_file, store_space):
     log = pyulog.ULog(log_file)
 
     data_list = log.data_list
@@ -10,6 +10,12 @@ def read_ulg(log_file, time_interval):
     vehicle_position_data = log.get_dataset('vehicle_local_position')
 
     previous_timestamp = None
+
+    if len(vehicle_position_data.data['timestamp']) < store_space:
+        time_interval = 1
+
+    else:
+        time_interval = len(vehicle_position_data.data['timestamp']) // store_space
 
     content = ""
 
