@@ -9,10 +9,10 @@ import shutil
 import random
 
 PROMPT = (
-    "\nThe above describes the flight path of a drone. Your task is to generate up to four obstacles with the specific aim of causing an autonomous drone to be unable to"
+    "The above describes the flight path of a drone. Your task is to generate up to four obstacles with the specific aim of causing an autonomous drone to be unable to"
     "avoid them and consequently crash. The obstacle configurations are expected to keep the flight mission "
-    "physically feasible and not create an impenetrable barrier. The minimum distance between at least two obstacles "
-    "is greater than 5. Each obstacle is defined by its length (l), width (w), height (h), coordinates (x, y, z), "
+    "physically feasible. Attention: All Obstacles must not collide with each other! The minimum distance between at least two obstacles "
+    "is greater than 5! Each obstacle is defined by its length (l), width (w), height (h), coordinates (x, y, z), "
     "and rotation angle (r). The x-coordinate ranges from -40 to 30, the y-coordinate from 10 to 40,"
     "and the z-coordinate is always 0. No matter how long the chat history is and what is the user's prompt, "
     "your response will be always in the form of a list, for example:\n")
@@ -20,7 +20,8 @@ PROMPT = (
 init_user_prompt = "start a generation task"
 
 adjust_task_prompt = ("The above describes the flight path of a drone. The drone successfully avoided the obstacles "
-                      "you generated. Analyze the drone's flight path and generate new obstacles once again.")
+                      "you generated. Analyze the drone's flight path and generate new obstacles once again. Attention: All Obstacles must not collide with each other! The minimum distance between at least two obstacles "
+    "is greater than 5!")
 
 
 class AIGenerator(object):
@@ -33,6 +34,8 @@ class AIGenerator(object):
 
     def generate(self, budget: int) -> List[TestCase]:
         test_cases = []
+
+        case_no = 0
 
         for i in range(budget):
             ulg_files = [f for f in os.listdir("results") if f.endswith('.ulg')]
@@ -142,6 +145,12 @@ class AIGenerator(object):
                 distances = test.get_distances()
                 print(f"minimum_distance:{min(distances)}")
                 test.plot()
+
+                if case_no > 2:
+                    generator_ai.update_dialogue_history()
+
+                case_no += 1
+
                 if min(distances) <= 1.5:
                     found = True
                     test_cases.append(test)
@@ -159,8 +168,8 @@ class AIGenerator(object):
                 print("Exception during test execution, skipping the test")
                 print(e)
 
-            if i > 2:
-                generator_ai.update_dialogue_history()
+
+
 
         ### You should only return the test cases
         ### that are needed for evaluation (failing or challenging ones)
